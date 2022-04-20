@@ -101,10 +101,10 @@ function start_sshuttle {
 
     # Open tunnel
     public_ip=$(get_public_ip)
-    wait_for_ssh "$public_ip"
+    wait_for_ssh "root@$public_ip"
     echo "Opening tunnel to ${PRIVATE_NETWORK_CIDR} and ${FLOATING_RANGE} via ${public_ip}"
     # sshuttle won't succeed until ssh is up and python is installed on the destination
-    retry 50 30 sshuttle -r "$public_ip" "$PRIVATE_NETWORK_CIDR" "$FLOATING_RANGE" --ssh-cmd=\""$(get_ssh_cmd)"\" -l 0.0.0.0 -D
+    retry 50 30 sshuttle -r "root@$public_ip" "$PRIVATE_NETWORK_CIDR" "$FLOATING_RANGE" --ssh-cmd=\""$(get_ssh_cmd)"\" -l 0.0.0.0 -D
 
     # Give sshuttle a few seconds to be fully up
     sleep 5
@@ -127,11 +127,11 @@ function wait_for_devstack {
     local ip=$1 && shift
 
     # Wait until cloud-init is done
-    wait_for_ssh "$ip"
+    wait_for_ssh "root@$ip"
 
     ssh_cmd=$(get_ssh_cmd)
 
-    $ssh_cmd "$ip" -- "
+    $ssh_cmd "root@$ip" -- "
     echo Waiting for cloud-final to complete
     start=\$(date -u +%s)
     while true; do
@@ -189,7 +189,7 @@ function create_devstack {
     fi
 
     # Ensure cloud-init exists and is empty
-    truncate --size 0 "$cloud_init"
+    truncate -s 0 "$cloud_init"
 
     for tpl in common "$name"; do
         SSH_PUBLIC_KEY="$(cat $(get_ssh_public_key_file))" \

@@ -148,11 +148,11 @@ function get_mtu {
 }
 
 function get_ssh_public_key_file {
-  echo /root/.ssh/google_compute_engine.pub
+  echo $HOME/.ssh/google_compute_engine.pub
 }
 
 function get_ssh_private_key_file {
-  echo /root/.ssh/google_compute_engine
+  echo $HOME/.ssh/google_compute_engine
 }
 
 function cloud_cleanup {
